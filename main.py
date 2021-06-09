@@ -2,7 +2,6 @@ import streamlit as st
 from bs4 import BeautifulSoup
 import selenium.webdriver as webdriver
 from urllib.request import urlopen as uReq
-import time
 import pandas as pd
 
 # streamlit run C:/Users/patri/CSGOCasePrices/main.py
@@ -22,40 +21,48 @@ st.markdown("""
 """)
 
 driver = webdriver.Chrome()
-cases = pd.DataFrame(columns=['Case', 'Quantity', 'Price'])
-case_name = []
-quantity = []
-price = []
-for page_number in range(1, 6):
-    url = 'https://steamcommunity.com/market/search?q=Case&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730#p' + str(
-        page_number) + '_price_desc'
-    driver.get(url)
-    pagesource = driver.page_source
 
-    uClient = uReq(url)
-    page_html = uClient.read()
-    uClient.close()
 
-    soup = BeautifulSoup(pagesource, "html.parser")
+def load_cases():
+    temp = pd.DataFrame(columns=['Case', 'Quantity', 'Price'])
+    case_name = []
+    quantity = []
+    price = []
+    for page_number in range(1, 6):
+        url = 'https://steamcommunity.com/market/search?q=Case&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730#p' + str(
+            page_number) + '_price_desc'
+        driver.get(url)
+        pagesource = driver.page_source
 
-    # finds each case
-    containers = soup.findAll("div", {"class": "market_listing_row"})
+        uClient = uReq(url)
+        page_html = uClient.read()
+        uClient.close()
 
-    for container in containers:
-        # case name
-        case_name.append(list(container.find("span", {"market_listing_item_name"}))[0].strip())
+        soup = BeautifulSoup(pagesource, "html.parser")
 
-        # number of cases
-        quantity.append(int(container.find("span", "market_listing_num_listings_qty")["data-qty"]))
+        # finds each case
+        containers = soup.findAll("div", {"class": "market_listing_row"})
 
-        # price of one case in dollars
-        value = (container.find("span", {"class": "normal_price"}))
-        full_price = float(value.span["data-price"]) / 100.0
-        price.append(full_price)
+        for container in containers:
+            # case name
+            case_name.append(list(container.find("span", {"market_listing_item_name"}))[0].strip())
 
-    time.sleep(2)
+            # number of cases
+            quantity.append(int(container.find("span", "market_listing_num_listings_qty")["data-qty"]))
 
-cases['Case'] = case_name
-cases['Quantity'] = quantity
-cases['Price'] = price
+            # price of one case in dollars
+            value = (container.find("span", {"class": "normal_price"}))
+            full_price = float(value.span["data-price"]) / 100.0
+            price.append(full_price)
+
+    temp['Case'] = case_name
+    temp['Quantity'] = quantity
+    temp['Price'] = price
+    return temp
+
+
+cases = load_cases()
 print(cases)
+
+st.subheader('Price and Quantity Data of CS:GO cases')
+st.dataframe(cases)
