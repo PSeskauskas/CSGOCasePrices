@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import selenium.webdriver as webdriver
 from urllib.request import urlopen as uReq
 import pandas as pd
+import time
 
 # streamlit run C:/Users/patri/CSGOCasePrices/main.py
 
@@ -22,47 +23,59 @@ st.markdown("""
 
 driver = webdriver.Chrome()
 
+sidebar = st.sidebar
+sidebar.header('Input Options')
+selected_item = sidebar.selectbox('Select the item type you would like to see', ('Cases', 'Other'))
 
-def load_cases():
-    temp = pd.DataFrame(columns=['Case', 'Quantity', 'Price'])
-    case_name = []
+
+@st.cache
+def load_item(pages, url):
+    temp = pd.DataFrame(columns=['Item', 'Quantity', 'Price'])
+    item_name = []
     quantity = []
     price = []
-    for page_number in range(1, 6):
-        url = 'https://steamcommunity.com/market/search?q=Case&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730#p' + str(
-            page_number) + '_price_desc'
-        driver.get(url)
+    for page_number in range(1, pages):
+        full_url = url + str(page_number) + '_price_desc'
+        driver.get(full_url)
         pagesource = driver.page_source
 
-        uClient = uReq(url)
+        uClient = uReq(full_url)
         page_html = uClient.read()
         uClient.close()
 
         soup = BeautifulSoup(pagesource, "html.parser")
 
         # finds each case
-        containers = soup.findAll("div", {"class": "market_listing_row"})
+        items = soup.findAll("div", {"class": "market_listing_row"})
 
-        for container in containers:
+        for item in items:
             # case name
-            case_name.append(list(container.find("span", {"market_listing_item_name"}))[0].strip())
+            item_name.append(list(item.find("span", {"market_listing_item_name"}))[0].strip())
 
             # number of cases
-            quantity.append(int(container.find("span", "market_listing_num_listings_qty")["data-qty"]))
+            quantity.append(int(item.find("span", "market_listing_num_listings_qty")["data-qty"]))
 
             # price of one case in dollars
-            value = (container.find("span", {"class": "normal_price"}))
+            value = (item.find("span", {"class": "normal_price"}))
             full_price = float(value.span["data-price"]) / 100.0
             price.append(full_price)
+            time.sleep(1)
 
-    temp['Case'] = case_name
+    temp['Item'] = item_name
     temp['Quantity'] = quantity
     temp['Price'] = price
     return temp
 
 
-cases = load_cases()
-print(cases)
+if selected_item == 'Cases':
+    url = 'https://steamcommunity.com/market/search?q=Case&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730#p'
+    cases = load_item(6, url)
 
-st.subheader('Price and Quantity Data of CS:GO cases')
-st.dataframe(cases)
+    sorted_cases = sorted(cases['Item'])
+    selected_cases = sidebar.multiselect('Item', sorted_cases, sorted_cases)
+
+    cases_selected_cases = cases[(cases['Item'].isin(selected_cases))]
+
+    st.subheader('Price and Quantity Data of CS:GO cases')
+    st.dataframe(cases_selected_cases)
+
