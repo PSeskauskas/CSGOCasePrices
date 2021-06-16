@@ -25,7 +25,7 @@ driver = webdriver.Chrome()
 
 sidebar = st.sidebar
 sidebar.header('Input Options')
-selected_item = sidebar.selectbox('Select the item type you would like to see', ('Cases', 'Other'))
+selected_item = sidebar.selectbox('Select the item type you would like to see', ('Souvenirs', 'Cases', 'Other'))
 
 
 @st.cache
@@ -78,4 +78,17 @@ if selected_item == 'Cases':
 
     st.subheader('Price and Quantity Data of CS:GO cases')
     st.dataframe(cases_selected_cases)
+
+
+elif selected_item == 'Souvenirs':
+    url = 'https://steamcommunity.com/market/search?category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730&q=Souvenir#p'
+    souvenirs = load_item(12, url)
+
+    sorted_souvenirs = sorted(souvenirs['Item'])
+    selected_souvenirs = sidebar.multiselect('Item', sorted_souvenirs, sorted_souvenirs)
+
+    souvenirs_selected_souvenirs = souvenirs[(souvenirs['Item'].isin(selected_souvenirs))]
+
+    st.subheader('Price and Quantity Data of CS:GO Souvenir Packages')
+    st.dataframe(souvenirs_selected_souvenirs)
 
