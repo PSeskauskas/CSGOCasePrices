@@ -9,7 +9,7 @@ import time
 
 st.set_page_config(layout="wide")
 
-st.title('CS:GO Case Price App')
+st.title('CS:GO Item Data App')
 
 st.markdown("""
 This app retrieves CS:GO case prices and quantities from the **Steam Community Market**
@@ -25,7 +25,7 @@ driver = webdriver.Chrome()
 
 sidebar = st.sidebar
 sidebar.header('Input Options')
-selected_item = sidebar.selectbox('Select the item type you would like to see', ('Souvenirs', 'Cases', 'Other'))
+selected_item = sidebar.selectbox('Select the item type you would like to see', ('Team Capsules', 'Autograph Capsules', 'Souvenirs', 'Cases', 'Other'))
 
 
 @st.cache
@@ -92,3 +92,44 @@ elif selected_item == 'Souvenirs':
     st.subheader('Price and Quantity Data of CS:GO Souvenir Packages')
     st.dataframe(souvenirs_selected_souvenirs)
 
+
+elif selected_item == 'Autograph Capsules':
+    url = 'https://steamcommunity.com/market/search?category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730&q=Legends+Autograph+Capsule#p'
+    legends_autographs = load_item(3, url)
+
+    url = 'https://steamcommunity.com/market/search?category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730&q=Challengers+Autograph+Capsule#p'
+    challengers_autographs = load_item(4, url)
+
+    datasets = [legends_autographs, challengers_autographs]
+
+    autographs = pd.concat(datasets)
+
+    sorted_autographs = sorted(autographs['Item'])
+    selected_autographs = sidebar.multiselect('Item', sorted_autographs, sorted_autographs)
+
+    autographs_sorted_autographs = autographs[(autographs['Item'].isin(selected_autographs))]
+
+    st.subheader('Price and Quantity Data of CS:GO Legends and Challengers Autograph Capsules')
+    st.dataframe(autographs_sorted_autographs)
+
+
+elif selected_item == 'Team Capsules':
+    url = 'https://steamcommunity.com/market/search?category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730&q=Legends#p'
+    legends_stickers = load_item(5, url)
+
+    url = 'https://steamcommunity.com/market/search?category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730&q=Challengers#p'
+    challengers_stickers = load_item(6, url)
+
+    url = 'https://steamcommunity.com/market/search?category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&category_730_Type%5B%5D=tag_CSGO_Type_WeaponCase&appid=730&q=Contenders#p'
+    contenders_stickers = load_item(3, url)
+
+    datasets = [legends_stickers, challengers_stickers, contenders_stickers]
+    capsules = pd.concat(datasets)
+
+    sorted_capsules = sorted(capsules['Item'])
+    selected_capsules = sidebar.multiselect('Item', sorted_capsules, sorted_capsules)
+
+    capsules_sorted_capsules = capsules[(capsules['Item'].isin(selected_capsules))]
+
+    st.subheader("Price and Quantity Data for CS:GO Team Capsules")
+    st.dataframe(capsules_sorted_capsules)
