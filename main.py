@@ -12,7 +12,7 @@ st.set_page_config(layout="wide")
 st.title('CS:GO Item Data App')
 
 st.markdown("""
-This app retrieves CS:GO case prices and quantities from the **Steam Community Market**
+This app retrieves CS:GO prices and quantities from the **Steam Community Market**
 """)
 
 st.markdown("""
@@ -30,6 +30,7 @@ def load_item(pages, item_url):
     quantity = []
     price = []
     for page_number in range(1, pages):
+        print(page_number)
         full_url = item_url + str(page_number) + '_price_desc'
         driver.get(full_url)
         pagesource = driver.page_source
@@ -54,7 +55,8 @@ def load_item(pages, item_url):
             value = (item.find("span", {"class": "normal_price"}))
             full_price = float(value.span["data-price"]) / 100.0
             price.append(full_price)
-            time.sleep(1)
+
+        time.sleep(2)
 
     temp['Item'] = item_name
     temp['Quantity'] = quantity
@@ -65,7 +67,7 @@ def load_item(pages, item_url):
 sidebar = st.sidebar
 sidebar.header('Input Options')
 selected_type = sidebar.selectbox('Select the item type you would like to see',
-                                  ('Stickers', 'Weapons', 'Cases', 'Souvenirs'))
+                                  ('Cases', 'Knives', 'Souvenirs', 'Stickers', 'Weapons'))
 
 if selected_type == 'Stickers':
 
@@ -122,6 +124,96 @@ elif selected_type == 'Cases':
 
     st.subheader('Price and Quantity Data of CS:GO cases')
     st.dataframe(cases_selected_cases)
+
+elif selected_type == 'Knives':
+    selected_weapon = sidebar.selectbox('Select the weapon you would like to see here', ('Bayonet', 'Bowie Knife', 'Butterfly Knife', 'Classic Knife', 'Falchion Knife',
+                                                                                         'Flip Knife', 'Gut Knife', 'Huntsman Knife', 'Karambit', 'M9 Bayonet',
+                                                                                         'Navaja Knife', 'Nomad Knife', 'Paracord Knife', 'Shadow Daggers', 'Skeleton Knife',
+                                                                                         'Stiletto Knife', 'Survival Knife', 'Talon Knife', 'Ursus Knife'))
+    knives = pd.DataFrame()
+    if selected_weapon == 'Bayonet':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_bayonet&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(5, url)
+
+    elif selected_weapon == 'Bowie Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_survival_bowie&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Butterfly Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_butterfly&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Classic Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_css&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Falchion Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_falchion&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Flip Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_flip&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Gut Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_gut&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(5, url)
+
+    elif selected_weapon == 'Huntsman Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_tactical&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Karambit':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_karambit&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'M9 Bayonet':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_m9_bayonet&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(5, url)
+
+    elif selected_weapon == 'Navaja Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_gypsy_jackknife&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Nomad Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_outdoor&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(2, url)
+
+    elif selected_weapon == 'Paracord Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_cord&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(2, url)
+
+    elif selected_weapon == 'Shadow Daggers':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_push&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Skeleton Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_skeleton&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(2, url)
+
+    elif selected_weapon == 'Stiletto Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_stiletto&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(5, url)
+
+    elif selected_weapon == 'Survival Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_canis&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(2, url)
+
+    elif selected_weapon == 'Talon Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_widowmaker&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    elif selected_weapon == 'Ursus Knife':
+        url = 'https://steamcommunity.com/market/search?q=&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=tag_weapon_knife_ursus&category_730_Exterior%5B%5D=tag_WearCategory0&appid=730#p'
+        knives = load_item(4, url)
+
+    sorted_knives = sorted(knives['Item'])
+    selected_knife = sidebar.multiselect('Item', sorted_knives, sorted_knives)
+
+    selected_knives = knives[(knives['Item'].isin(selected_knife))]
+
+    st.subheader('Price and Quantity Data of Selected Knife in Factory New Condition')
+    st.dataframe(selected_knives)
 
 elif selected_type == 'Weapons':
     st.subheader('Work in progress')
